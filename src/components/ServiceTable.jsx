@@ -17,7 +17,14 @@ const statusOrder = { 'Masuk': 1, 'Pengecekan': 2, 'Dikerjakan': 3, 'Selesai': 4
 
 function ServiceTable({ services, onEdit, onDelete, onStatusChange }) {
   if (!services || services.length === 0) {
-    return <div className="text-center py-10 text-gray-500">Tidak ada data untuk ditampilkan.</div>;
+    return (
+      <div className="flex-grow flex items-center justify-center h-full bg-white rounded-lg shadow border">
+        <div className="text-center text-gray-500">
+          <p className="text-lg font-semibold">Tidak Ada Data Servis</p>
+          <p className="text-sm">Silakan ubah filter atau tambahkan data servis baru.</p>
+        </div>
+      </div>
+    );
   }
 
   const handleStatusChange = (service, newStatus) => {
@@ -63,7 +70,7 @@ function ServiceTable({ services, onEdit, onDelete, onStatusChange }) {
   };
 
   return (
-    <div className="overflow-x-auto bg-white rounded-lg shadow">
+    <div className="overflow-x-auto bg-white rounded-lg shadow border h-full">
       <table className="min-w-full text-sm align-top">
         <thead className="bg-gray-50">
           <tr>
