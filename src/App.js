@@ -12,6 +12,8 @@ import { Plus, LogOut, MessageSquare, Search, Filter, MinusCircle, PlusCircle } 
 injectSpeedInsights();
 
 // --- Komponen Modal untuk Form (DIPERBARUI) ---
+// Ganti fungsi ServiceFormModal yang lama dengan kode yang ini di dalam src/App.js
+
 function ServiceFormModal({ isOpen, onClose, onSave, isLoading, initialData }) {
   const initialItemState = { name: '', damage: '', notes: '' };
   const [formData, setFormData] = useState({ high_priority: false, items: [initialItemState] });
@@ -65,7 +67,6 @@ function ServiceFormModal({ isOpen, onClose, onSave, isLoading, initialData }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4 overflow-y-auto">
-      {/* --- PERUBAHAN: Tampilan Form Utama --- */}
       <form onSubmit={handleSubmit} className="bg-white p-8 rounded-xl shadow-2xl w-full max-w-2xl border border-gray-200">
         <h2 className="text-2xl font-bold text-gray-800 mb-8">{formData.id ? 'Edit Servis' : 'Tambah Servis Baru'}</h2>
 
@@ -99,13 +100,18 @@ function ServiceFormModal({ isOpen, onClose, onSave, isLoading, initialData }) {
                      className="block w-full px-4 py-2 text-gray-700 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors flex-1" />
               <input name="notes" value={item.notes} onChange={(e) => handleItemChange(index, e)} placeholder="Catatan" 
                      className="block w-full px-4 py-2 text-gray-700 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors flex-1" />
+              
+              {/* --- PERBAIKAN ICON (-) --- */}
               <button type="button" onClick={() => removeItem(index)} disabled={formData.items.length <= 1} 
-                      className="flex-shrink-0 p-2 text-gray-400 rounded-full hover:bg-red-100 hover:text-red-600 transition-colors disabled:opacity-50 disabled:hover:bg-transparent">
+                      className="flex-shrink-0 p-2 text-gray-400 rounded-full hover:bg-red-100 hover:text-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-gray-400">
                 <MinusCircle size={20} />
               </button>
             </div>
           ))}
-          <button type="button" onClick={addItem} className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-medium mt-3 transition-colors">
+
+          {/* --- PERBAIKAN TOMBOL (+) --- */}
+          <button type="button" onClick={addItem} 
+                  className="flex items-center gap-2 text-sm text-blue-600 font-semibold mt-3 px-4 py-2 rounded-md hover:bg-blue-50 transition-colors">
             <PlusCircle size={20} /> Tambah Barang Lain
           </button>
         </div>
@@ -114,12 +120,12 @@ function ServiceFormModal({ isOpen, onClose, onSave, isLoading, initialData }) {
         <div className="mt-6 p-3 bg-red-50 rounded-lg flex items-center gap-3">
           <input type="checkbox" id="high_priority" name="high_priority" checked={!!formData.high_priority} onChange={handleChange} 
                  className="h-5 w-5 text-red-600 border-gray-300 rounded focus:ring-red-500"/>
-          <label htmlFor="high_priority" className="font-medium text-red-800">Jadikan Prioritas Tinggi (High Priority)</label>
+          <label htmlFor="high_priority" className="font-medium text-red-800">Jadikan Prioritas Tinggi</label>
         </div>
 
         <div className="flex justify-end gap-4 mt-8 pt-6 border-t">
           <button type="button" onClick={onClose} 
-                  className="px-6 py-2 bg-transparent text-gray-700 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors">
+                  className="px-6 py-2 bg-gray-100 text-gray-800 font-semibold rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition-colors">
             Batal
           </button>
           <button type="submit" disabled={isLoading} 
