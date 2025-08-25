@@ -18,7 +18,7 @@ const statusOrder = { 'Masuk': 1, 'Pengecekan': 2, 'Dikerjakan': 3, 'Selesai': 4
 function ServiceTable({ services, onEdit, onDelete, onStatusChange }) {
   if (!services || services.length === 0) {
     return (
-      <div className="flex-grow flex items-center justify-center h-full bg-white rounded-lg shadow border">
+      <div className="flex-grow flex items-center justify-center h-full bg-white rounded-lg shadow-sm border">
         <div className="text-center text-gray-500">
           <p className="text-lg font-semibold">Tidak Ada Data Servis</p>
           <p className="text-sm">Silakan ubah filter atau tambahkan data servis baru.</p>
@@ -28,6 +28,7 @@ function ServiceTable({ services, onEdit, onDelete, onStatusChange }) {
   }
 
   const handleStatusChange = (service, newStatus) => {
+    // ... (logika tidak berubah)
     const currentStatusOrder = statusOrder[service.status];
     const newStatusOrder = statusOrder[newStatus];
     if (service.status === newStatus) return;
@@ -47,7 +48,7 @@ function ServiceTable({ services, onEdit, onDelete, onStatusChange }) {
   
   const formatDeadline = (deadline) => {
     if (!deadline) return null;
-    const date = new Date(deadline + 'T00:00:00'); // Tambahkan T00:00:00 agar tidak terpengaruh timezone
+    const date = new Date(deadline + 'T00:00:00');
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -70,32 +71,33 @@ function ServiceTable({ services, onEdit, onDelete, onStatusChange }) {
   };
 
   return (
-    <div className="overflow-x-auto bg-white rounded-lg shadow border h-full">
-      <table className="min-w-full text-sm align-top">
+    // --- PERBAIKAN Tampilan Pembungkus Tabel ---
+    <div className="w-full h-full overflow-x-auto bg-white rounded-lg shadow-sm border">
+      <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>
-            <th className="p-3 text-left">ID</th>
-            <th className="p-3 text-left">Tanggal</th>
-            <th className="p-3 text-left">Pelanggan</th>
-            <th className="p-3 text-left">Barang & Kerusakan</th>
-            <th className="p-3 text-left">Status</th>
-            <th className="p-3 text-center">Aksi</th>
+            {/* --- PERBAIKAN Header Tabel (th) --- */}
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pelanggan</th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Barang & Kerusakan</th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+            <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="bg-white divide-y divide-gray-200">
          {services.map((service, index) => (
-            <tr 
-              key={service.id} 
-              className={`border-b ${getStatusHighlightStyle(service.status)} ${service.high_priority ? 'border-l-4 border-red-500' : ''} animate-slide-in-top`}
-              style={{ animationDelay: `${index * 70}ms` }}
-            >
-              <td className="p-3 font-mono text-xs">{service.id}</td>
-              <td className="p-3">
-                {new Date(service.created_at).toLocaleDateString('id-ID')}
+            <tr key={service.id} className={`${getStatusHighlightStyle(service.status)} transition-colors duration-150`}>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">{service.id}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                {new Date(service.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}
                 {service.deadline && <div className="mt-1">{formatDeadline(service.deadline)}</div>}
               </td>
-              <td className="p-3">{service.customer_name}<br/><small className="text-gray-500">{service.customer_phone}</small></td>
-              <td className="p-3">
+              <td className="px-6 py-4 whitespace-nowrap text-sm">
+                <div className="font-medium text-gray-900">{service.customer_name}</div>
+                <div className="text-gray-500">{service.customer_phone}</div>
+              </td>
+              <td className="px-6 py-4 text-sm text-gray-800">
                 {Array.isArray(service.item_name) ? (
                   <ul className="space-y-2">
                     {service.item_name.map((item, i) => (
@@ -106,15 +108,14 @@ function ServiceTable({ services, onEdit, onDelete, onStatusChange }) {
                       </li>
                     ))}
                   </ul>
-                ) : (
-                  <div>
-                    <div className="font-semibold">{service.item_name}</div>
-                    {service.item_damage && <div className="text-gray-600 text-xs">- {service.item_damage}</div>}
-                  </div>
+                ) : ( 
+                  /* Fallback untuk data lama jika ada */
+                  <div className="font-semibold">{service.item_name}</div>
                 )}
               </td>
-              <td className="p-3">
-                <select value={service.status} onChange={(e) => handleStatusChange(service, e.target.value)} data-id={service.id} className="p-1 border rounded bg-white w-full">
+              <td className="px-6 py-4 whitespace-nowrap text-sm">
+                {/* --- PERBAIKAN Tampilan Select/Dropdown --- */}
+                <select value={service.status} onChange={(e) => handleStatusChange(service, e.target.value)} data-id={service.id} className="p-1.5 border border-gray-300 rounded-md bg-white w-full text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
                   <option value="Masuk">Masuk</option>
                   <option value="Pengecekan">Pengecekan</option>
                   <option value="Dikerjakan">Dikerjakan</option>
@@ -123,10 +124,11 @@ function ServiceTable({ services, onEdit, onDelete, onStatusChange }) {
                   <option value="Batal">Batal</option>
                 </select>
               </td>
-              <td className="p-3 text-center">
-                  <div className="flex justify-center gap-1">
-                      <button onClick={() => onEdit(service)} className="p-2 hover:bg-gray-200 rounded-full" title="Edit"><Edit size={16}/></button>
-                      <button onClick={() => onDelete(service.id)} className="p-2 hover:bg-gray-200 rounded-full" title="Hapus"><Trash2 size={16}/></button>
+              <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                  <div className="flex justify-center gap-2">
+                      {/* --- PERBAIKAN Tombol Aksi --- */}
+                      <button onClick={() => onEdit(service)} className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-100 rounded-full transition-colors" title="Edit"><Edit size={16}/></button>
+                      <button onClick={() => onDelete(service.id)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-100 rounded-full transition-colors" title="Hapus"><Trash2 size={16}/></button>
                   </div>
               </td>
             </tr>
