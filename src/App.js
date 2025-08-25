@@ -202,45 +202,50 @@ function ServicePage() {
     }
 
 return (
-    // Gunakan React Fragment (<>) sebagai pembungkus utama
-    <>
-      <div className="flex flex-col h-screen bg-gray-100">
-        <div className={`container mx-auto p-4 sm:p-6 lg:p-8 transition-opacity duration-700 ${isLoaded ? 'animate-slide-in-up' : 'opacity-0'}`}>
-            <div className="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
-                <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Manajemen Servis</h1>
-                <div className="flex items-center gap-2 md:gap-4">
-                    <Link to="/whatsapp" className="flex items-center gap-2 px-3 py-2 md:px-4 bg-green-600 text-white rounded-lg hover:bg-green-700 text-xs md:text-sm"><MessageSquare size={16} /><span className="hidden sm:inline">Hubungkan WA</span></Link>
-                    <button onClick={handleAddNew} className="flex items-center gap-2 px-3 py-2 md:px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-xs md:text-sm"><Plus size={16} /><span className="hidden sm:inline">Tambah Servis</span></button>
-                    <button onClick={handleLogout} className="p-2 hover:bg-gray-200 rounded-full" title="Logout"><LogOut size={20} /></button>
-                </div>
-            </div>
-            <div className="mb-6 flex flex-col sm:flex-row gap-4">
-                <div className="relative flex-grow">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-                    <input type="text" placeholder="Cari ID, nama, barang..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full p-3 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                </div>
-                <div className="relative">
-                    <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-                    <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="w-full sm:w-auto p-3 pl-10 border rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="all">Semua Status</option><option value="Masuk">Masuk</option><option value="Pengecekan">Pengecekan</option><option value="Dikerjakan">Dikerjakan</option><option value="Selesai">Selesai</option><option value="Diambil">Diambil</option><option value="Batal">Batal</option>
-                    </select>
-                </div>
-            </div>
-            <div className="border-b border-gray-200 mb-4">
-                <nav className="-mb-px flex gap-2" aria-label="Tabs">
-                    <button onClick={() => setActiveTab('active')} className={`py-3 px-4 md:px-6 rounded-t-lg font-medium text-xs md:text-sm transition-colors ${activeTab === 'active' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}>Pekerjaan Aktif ({activeServices.length})</button>
-                    <button onClick={() => setActiveTab('history')} className={`py-3 px-4 md:px-6 rounded-t-lg font-medium text-xs md:text-sm transition-colors ${activeTab === 'history' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}>Riwayat Servis ({historyServices.length})</button>
-                </nav>
-            </div>
-            <ServiceFormModal isOpen={isFormOpen} onClose={() => setFormOpen(false)} onSave={handleSave} isLoading={isLoading} initialData={editingService} />
-            <div key={activeTab + statusFilter + searchQuery} className="animate-slide-in-left flex grow">
-                <ServiceTable services={servicesToShow} onEdit={handleEdit} onDelete={handleDelete} onStatusChange={handleStatusChange} />
-            </div>
-        </div>
+    <div className="flex flex-col h-screen bg-gray-100">
+      {/* PENAMBAHAN KELAS: 
+        - flex, flex-col: Menjadikan container ini sebagai flex container vertikal.
+        - flex-grow: Membuat container ini mengisi sisa ruang yang ada.
+      */}
+      <div className={`container mx-auto p-4 sm:p-6 lg:p-8 flex flex-col flex-grow transition-opacity duration-700 ${isLoaded ? 'animate-slide-in-up' : 'opacity-0'}`}>
+          <div className="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Manajemen Servis</h1>
+              <div className="flex items-center gap-2 md:gap-4">
+                  <Link to="/whatsapp" className="flex items-center gap-2 px-3 py-2 md:px-4 bg-green-600 text-white rounded-lg hover:bg-green-700 text-xs md:text-sm"><MessageSquare size={16} /><span className="hidden sm:inline">Hubungkan WA</span></Link>
+                  <button onClick={handleAddNew} className="flex items-center gap-2 px-3 py-2 md:px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-xs md:text-sm"><Plus size={16} /><span className="hidden sm:inline">Tambah Servis</span></button>
+                  <button onClick={handleLogout} className="p-2 hover:bg-gray-200 rounded-full" title="Logout"><LogOut size={20} /></button>
+              </div>
+          </div>
+          <div className="mb-6 flex flex-col sm:flex-row gap-4">
+              <div className="relative flex-grow">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                  <input type="text" placeholder="Cari ID, nama, barang..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full p-3 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              </div>
+              <div className="relative">
+                  <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                  <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="w-full sm:w-auto p-3 pl-10 border rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500">
+                      <option value="all">Semua Status</option><option value="Masuk">Masuk</option><option value="Pengecekan">Pengecekan</option><option value="Dikerjakan">Dikerjakan</option><option value="Selesai">Selesai</option><option value="Diambil">Diambil</option><option value="Batal">Batal</option>
+                  </select>
+              </div>
+          </div>
+          <div className="border-b border-gray-200 mb-4">
+              <nav className="-mb-px flex gap-2" aria-label="Tabs">
+                  <button onClick={() => setActiveTab('active')} className={`py-3 px-4 md:px-6 rounded-t-lg font-medium text-xs md:text-sm transition-colors ${activeTab === 'active' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}>Pekerjaan Aktif ({activeServices.length})</button>
+                  <button onClick={() => setActiveTab('history')} className={`py-3 px-4 md:px-6 rounded-t-lg font-medium text-xs md:text-sm transition-colors ${activeTab === 'history' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}>Riwayat Servis ({historyServices.length})</button>
+              </nav>
+          </div>
+          <ServiceFormModal isOpen={isFormOpen} onClose={() => setFormOpen(false)} onSave={handleSave} isLoading={isLoading} initialData={editingService} />
+          {/* PENAMBAHAN KELAS:
+            - flex-grow: Membuat area tabel ini mengisi sisa ruang di dalam container.
+            - flex: Diperlukan agar child-nya (ServiceTable) bisa menggunakan h-full dengan benar.
+          */}
+          <div key={activeTab + statusFilter + searchQuery} className="animate-slide-in-left flex-grow flex">
+              <ServiceTable services={servicesToShow} onEdit={handleEdit} onDelete={handleDelete} onStatusChange={handleStatusChange} />
+          </div>
       </div>
-    </>
+    </div>
   );
-  }
+}
 // --- Komponen App Utama (Router) tidak berubah ---
 function App() {
   return (
