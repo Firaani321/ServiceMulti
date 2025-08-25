@@ -23,7 +23,7 @@ function ServiceFormModal({ isOpen, onClose, onSave, isLoading, initialData }) {
         // Format data dari database untuk ditampilkan di form edit
         const items = Array.isArray(initialData.item_name)
           ? initialData.item_name.map((name, index) => ({
-              name: name || '',
+              name: name,
               damage: (Array.isArray(initialData.item_damage) && initialData.item_damage[index]) || '',
               notes: (Array.isArray(initialData.item_notes) && initialData.item_notes[index]) || ''
             }))
@@ -71,25 +71,23 @@ function ServiceFormModal({ isOpen, onClose, onSave, isLoading, initialData }) {
       <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-xl w-full max-w-2xl">
         <h2 className="text-xl font-bold mb-6">{formData.id ? 'Edit Servis' : 'Tambah Servis Baru'}</h2>
 
-        {/* --- Bagian Pelanggan & Deadline --- */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <input name="customer_name" value={formData.customer_name || ''} onChange={handleChange} placeholder="Nama Pelanggan" className="p-2 border rounded w-full" required />
-          <input name="customer_phone" value={formData.customer_phone || ''} onChange={handleChange} placeholder="No. Telepon" className="p-2 border rounded w-full" />
+          <input name="customer_name" value={formData.customer_name || ''} onChange={handleChange} placeholder="Nama Pelanggan" className="p-2 border rounded" required />
+          <input name="customer_phone" value={formData.customer_phone || ''} onChange={handleChange} placeholder="No. Telepon" className="p-2 border rounded" />
           <div className="md:col-span-2">
             <label htmlFor="deadline" className="block text-sm font-medium text-gray-700 mb-1">Deadline</label>
             <input type="date" id="deadline" name="deadline" value={formData.deadline || ''} onChange={handleChange} className="p-2 border rounded w-full" />
           </div>
         </div>
 
-        {/* --- Bagian Daftar Barang (DIPERBAIKI) --- */}
         <div className="mb-4">
           <h3 className="font-bold mb-2">Daftar Barang</h3>
           {formData.items.map((item, index) => (
-            <div key={index} className="flex items-center gap-2 mb-2">
-              <input name="name" value={item.name} onChange={(e) => handleItemChange(index, e)} placeholder={`Nama Barang ${index + 1}`} className="p-2 border rounded w-full flex-1" required />
-              <input name="damage" value={item.damage} onChange={(e) => handleItemChange(index, e)} placeholder="Kerusakan" className="p-2 border rounded w-full flex-1" />
-              <input name="notes" value={item.notes} onChange={(e) => handleItemChange(index, e)} placeholder="Catatan" className="p-2 border rounded w-full flex-1" />
-              <button type="button" onClick={() => removeItem(index)} disabled={formData.items.length <= 1} className="p-2 text-red-500 disabled:text-gray-300 flex-shrink-0">
+            <div key={index} className="grid grid-cols-[1fr_1fr_1fr_auto] items-center gap-2 mb-2">
+              <input name="name" value={item.name} onChange={(e) => handleItemChange(index, e)} placeholder={`Nama Barang ${index + 1}`} className="p-2 border rounded" required />
+              <input name="damage" value={item.damage} onChange={(e) => handleItemChange(index, e)} placeholder="Kerusakan" className="p-2 border rounded" />
+              <input name="notes" value={item.notes} onChange={(e) => handleItemChange(index, e)} placeholder="Catatan (opsional)" className="p-2 border rounded" />
+              <button type="button" onClick={() => removeItem(index)} disabled={formData.items.length <= 1} className="p-2 text-red-500 disabled:text-gray-300">
                 <MinusCircle size={20} />
               </button>
             </div>
@@ -99,14 +97,13 @@ function ServiceFormModal({ isOpen, onClose, onSave, isLoading, initialData }) {
           </button>
         </div>
         
-        {/* --- Bagian Prioritas & Tombol --- */}
         <div className="flex items-center gap-2 my-6">
-          <input type="checkbox" id="high_priority" name="high_priority" checked={!!formData.high_priority} onChange={handleChange} className="h-4 w-4 rounded" />
-          <label htmlFor="high_priority" className="font-medium text-red-600">Jadikan Prioritas Tinggi</label>
+          <input type="checkbox" id="high_priority" name="high_priority" checked={!!formData.high_priority} onChange={handleChange} className="h-4 w-4" />
+          <label htmlFor="high_priority" className="font-medium text-red-600">Jadikan Prioritas Tinggi (High Priority)</label>
         </div>
 
         <div className="flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 rounded text-black">Batal</button>
+          <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 rounded">Batal</button>
           <button type="submit" disabled={isLoading} className="px-4 py-2 bg-blue-600 text-white rounded">{isLoading ? 'Menyimpan...' : 'Simpan'}</button>
         </div>
       </form>
@@ -204,7 +201,10 @@ function ServicePage() {
         return <LoginPage onLoginSuccess={handleLoginSuccess} />;
     }
 
-    return (
+return (
+    // Gunakan React Fragment (<>) sebagai pembungkus utama
+    <>
+      <div className="flex flex-col h-screen bg-gray-100">
         <div className={`container mx-auto p-4 sm:p-6 lg:p-8 transition-opacity duration-700 ${isLoaded ? 'animate-slide-in-up' : 'opacity-0'}`}>
             <div className="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
                 <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Manajemen Servis</h1>
@@ -233,13 +233,14 @@ function ServicePage() {
                 </nav>
             </div>
             <ServiceFormModal isOpen={isFormOpen} onClose={() => setFormOpen(false)} onSave={handleSave} isLoading={isLoading} initialData={editingService} />
-            <div key={activeTab + statusFilter + searchQuery} className="animate-slide-in-left">
+            <div key={activeTab + statusFilter + searchQuery} className="animate-slide-in-left flex grow">
                 <ServiceTable services={servicesToShow} onEdit={handleEdit} onDelete={handleDelete} onStatusChange={handleStatusChange} />
             </div>
         </div>
-    );
-}
-
+      </div>
+    </>
+  );
+  }
 // --- Komponen App Utama (Router) tidak berubah ---
 function App() {
   return (
