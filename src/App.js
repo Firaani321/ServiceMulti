@@ -13,24 +13,21 @@ injectSpeedInsights();
 
 // --- Komponen Modal untuk Form (DIPERBARUI) ---
 function ServiceFormModal({ isOpen, onClose, onSave, isLoading, initialData }) {
-  // State default untuk item dinamis
   const initialItemState = { name: '', damage: '', notes: '' };
   const [formData, setFormData] = useState({ high_priority: false, items: [initialItemState] });
 
   useEffect(() => {
     if (isOpen) {
       if (initialData && initialData.id) {
-        // Format data dari database untuk ditampilkan di form edit
         const items = Array.isArray(initialData.item_name)
           ? initialData.item_name.map((name, index) => ({
-              name: name,
+              name: name || '',
               damage: (Array.isArray(initialData.item_damage) && initialData.item_damage[index]) || '',
               notes: (Array.isArray(initialData.item_notes) && initialData.item_notes[index]) || ''
             }))
           : [initialItemState];
         setFormData({ ...initialData, items: items.length > 0 ? items : [initialItemState] });
       } else {
-        // Reset form untuk entri baru
         setFormData({
           customer_name: '', customer_phone: '', high_priority: false,
           items: [initialItemState], deadline: '',
@@ -67,44 +64,68 @@ function ServiceFormModal({ isOpen, onClose, onSave, isLoading, initialData }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4 overflow-y-auto">
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-xl w-full max-w-2xl">
-        <h2 className="text-xl font-bold mb-6">{formData.id ? 'Edit Servis' : 'Tambah Servis Baru'}</h2>
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4 overflow-y-auto">
+      {/* --- PERUBAHAN: Tampilan Form Utama --- */}
+      <form onSubmit={handleSubmit} className="bg-white p-8 rounded-xl shadow-2xl w-full max-w-2xl border border-gray-200">
+        <h2 className="text-2xl font-bold text-gray-800 mb-8">{formData.id ? 'Edit Servis' : 'Tambah Servis Baru'}</h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <input name="customer_name" value={formData.customer_name || ''} onChange={handleChange} placeholder="Nama Pelanggan" className="p-2 border rounded" required />
-          <input name="customer_phone" value={formData.customer_phone || ''} onChange={handleChange} placeholder="No. Telepon" className="p-2 border rounded" />
+        {/* --- Bagian Pelanggan & Deadline --- */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mb-6">
+          <div>
+            <label htmlFor="customer_name" className="block text-sm font-medium text-gray-600 mb-1">Nama Pelanggan</label>
+            <input id="customer_name" name="customer_name" value={formData.customer_name || ''} onChange={handleChange} placeholder="Contoh: Budi Santoso" required 
+                   className="block w-full px-4 py-2 text-gray-700 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"/>
+          </div>
+          <div>
+            <label htmlFor="customer_phone" className="block text-sm font-medium text-gray-600 mb-1">No. Telepon</label>
+            <input id="customer_phone" name="customer_phone" value={formData.customer_phone || ''} onChange={handleChange} placeholder="Contoh: 081234567890" 
+                   className="block w-full px-4 py-2 text-gray-700 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"/>
+          </div>
           <div className="md:col-span-2">
-            <label htmlFor="deadline" className="block text-sm font-medium text-gray-700 mb-1">Deadline</label>
-            <input type="date" id="deadline" name="deadline" value={formData.deadline || ''} onChange={handleChange} className="p-2 border rounded w-full" />
+            <label htmlFor="deadline" className="block text-sm font-medium text-gray-600 mb-1">Deadline</label>
+            <input type="date" id="deadline" name="deadline" value={formData.deadline || ''} onChange={handleChange} 
+                   className="block w-full px-4 py-2 text-gray-700 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" />
           </div>
         </div>
 
-        <div className="mb-4">
-          <h3 className="font-bold mb-2">Daftar Barang</h3>
+        {/* --- Bagian Daftar Barang --- */}
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold text-gray-700 mb-3 border-b pb-2">Daftar Barang</h3>
           {formData.items.map((item, index) => (
-            <div key={index} className="grid grid-cols-[1fr_1fr_1fr_auto] items-center gap-2 mb-2">
-              <input name="name" value={item.name} onChange={(e) => handleItemChange(index, e)} placeholder={`Nama Barang ${index + 1}`} className="p-2 border rounded" required />
-              <input name="damage" value={item.damage} onChange={(e) => handleItemChange(index, e)} placeholder="Kerusakan" className="p-2 border rounded" />
-              <input name="notes" value={item.notes} onChange={(e) => handleItemChange(index, e)} placeholder="Catatan (opsional)" className="p-2 border rounded" />
-              <button type="button" onClick={() => removeItem(index)} disabled={formData.items.length <= 1} className="p-2 text-red-500 disabled:text-gray-300">
+            <div key={index} className="flex items-center gap-3 mb-2">
+              <input name="name" value={item.name} onChange={(e) => handleItemChange(index, e)} placeholder={`Nama Barang ${index + 1}`} required 
+                     className="block w-full px-4 py-2 text-gray-700 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors flex-1" />
+              <input name="damage" value={item.damage} onChange={(e) => handleItemChange(index, e)} placeholder="Kerusakan" 
+                     className="block w-full px-4 py-2 text-gray-700 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors flex-1" />
+              <input name="notes" value={item.notes} onChange={(e) => handleItemChange(index, e)} placeholder="Catatan" 
+                     className="block w-full px-4 py-2 text-gray-700 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors flex-1" />
+              <button type="button" onClick={() => removeItem(index)} disabled={formData.items.length <= 1} 
+                      className="flex-shrink-0 p-2 text-gray-400 rounded-full hover:bg-red-100 hover:text-red-600 transition-colors disabled:opacity-50 disabled:hover:bg-transparent">
                 <MinusCircle size={20} />
               </button>
             </div>
           ))}
-          <button type="button" onClick={addItem} className="flex items-center gap-2 text-blue-600 mt-2 text-sm font-medium">
+          <button type="button" onClick={addItem} className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-medium mt-3 transition-colors">
             <PlusCircle size={20} /> Tambah Barang Lain
           </button>
         </div>
         
-        <div className="flex items-center gap-2 my-6">
-          <input type="checkbox" id="high_priority" name="high_priority" checked={!!formData.high_priority} onChange={handleChange} className="h-4 w-4" />
-          <label htmlFor="high_priority" className="font-medium text-red-600">Jadikan Prioritas Tinggi (High Priority)</label>
+        {/* --- Bagian Prioritas & Tombol Aksi --- */}
+        <div className="mt-6 p-3 bg-red-50 rounded-lg flex items-center gap-3">
+          <input type="checkbox" id="high_priority" name="high_priority" checked={!!formData.high_priority} onChange={handleChange} 
+                 className="h-5 w-5 text-red-600 border-gray-300 rounded focus:ring-red-500"/>
+          <label htmlFor="high_priority" className="font-medium text-red-800">Jadikan Prioritas Tinggi (High Priority)</label>
         </div>
 
-        <div className="flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 rounded">Batal</button>
-          <button type="submit" disabled={isLoading} className="px-4 py-2 bg-blue-600 text-white rounded">{isLoading ? 'Menyimpan...' : 'Simpan'}</button>
+        <div className="flex justify-end gap-4 mt-8 pt-6 border-t">
+          <button type="button" onClick={onClose} 
+                  className="px-6 py-2 bg-transparent text-gray-700 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors">
+            Batal
+          </button>
+          <button type="submit" disabled={isLoading} 
+                  className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:opacity-50">
+            {isLoading ? 'Menyimpan...' : 'Simpan'}
+          </button>
         </div>
       </form>
     </div>
